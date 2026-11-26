@@ -180,6 +180,8 @@ float nivelR = 0, nivelP = 0;
 // "Subida reta": no modo LEVE (botão do controle) o analógico 2 é ignorado —
 // o drone fica travado no nível (com nr/np) e o analógico 1 só sobe/desce.
 bool modoReto = true;
+// Inclinação máxima do analógico 2 no modo LEVE com "reto" ligado (baixa sensibilidade). 0 = ignora o stick.
+float angLeve = 5.0f;
 
 // ---- Trim aprendido: base do integrador que compensa motor/CG assimétricos ----
 float trimR = 0, trimP = 0, trimY = 0;      // contagens de PWM, salvas na NVS
@@ -288,6 +290,7 @@ void carregarConfig() {
   nivelR = prefs.getFloat("nivR", 0);
   nivelP = prefs.getFloat("nivP", 0);
   modoReto = prefs.getBool("reto", true);
+  angLeve = prefs.getFloat("aleve", 5.0f);
   tauVoo = prefs.getFloat("tau", 5.0f);
   prefs.end();
 }
@@ -326,6 +329,7 @@ void salvarConfig() {
   prefs.putFloat("nivR", nivelR);
   prefs.putFloat("nivP", nivelP);
   prefs.putBool("reto", modoReto);
+  prefs.putFloat("aleve", angLeve);
   prefs.putFloat("tau", tauVoo);
   prefs.end();
   msg("Configuracao salva na memoria.");
@@ -345,8 +349,8 @@ void mostrarGanhos() {
   msg("sticks: analogico 1 = velocidade%s | analogico 2 = lados + frente/tras",
       yawStick ? " + girar" : " (girar desligado)");
   msg("ajuste de nivel: nr=%.1f (+ = direita) np=%.1f (+ = frente) graus", nivelR, nivelP);
-  msg("modo LEVE: %s | MEDIO/AVANCADO: analogico 2 ativo",
-      modoReto ? "SUBIDA RETA (analogico 2 ignorado)" : "normal (12 graus)");
+  msg("modo LEVE: analogico 2 ate %.1f graus%s | MEDIO 25 / AVANCADO 40 graus",
+      modoReto ? angLeve : 12.0f, modoReto ? " (baixa sensibilidade, aleve)" : "");
   msg("orientacao: roll=%c%c pitch=%c%c yaw=%c%c | gravidade=%s",
       cfg.sinalR > 0 ? '+' : '-', nomes[cfg.eixoR],
       cfg.sinalP > 0 ? '+' : '-', nomes[cfg.eixoP],
@@ -877,6 +881,7 @@ void processarComando(char *linha) {
   else if (c == "thz") alvo = &thrHz;
   else if (c == "tpa" && v <= 0.8f) alvo = &tpa;
   else if (c == "tau" && v >= 0.3f && v <= 30) alvo = &tauVoo;
+  else if (c == "aleve" && v <= 25) alvo = &angLeve;
   else if (c == "tmax" && v >= thrHover + 30 && v <= THR_MAX) alvo = &thrMax;
   else if (c == "tpab" && v >= ESC_IDLE && v <= THR_MAX) alvo = &tpaBreak;
   if (alvo && temValor && v >= 0 && v < 1000) {
@@ -1089,7 +1094,11 @@ void loop() {
       throttleBase = (int)thrFilt;
     }
     if (!yawStick) alvoYaw = 0;   // analógico 1 só controla a velocidade
-    if (modoReto && comando.modo == 1) { alvoRoll = 0; alvoPitch = 0; }   // LEVE: só sobe/desce, nivelado
+    // LEVE: analógico 2 com baixa sensibilidade (no máximo angLeve graus; 0 = ignora)
+    if (modoReto && comando.modo == 1) {
+      alvoRoll  = (comando.roll / 1000.0f) * angLeve;
+      alvoPitch = (comando.pitch / 1000.0f) * angLeve;
+    }
     alvoRoll += nivelR;
     alvoPitch += nivelP;
     alvoRollLog = alvoRoll;
