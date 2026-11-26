@@ -106,11 +106,11 @@ def etapa_repouso(s, out, pasta):
         out("  " + l)
 
 
-def etapa_vib(s, out):
+def etapa_vib(s, out, confirmado=False):
     out("\n== Vibração por motor (vib 740) ==")
     print("ATENÇÃO: os motores vão girar (cada um 2,5 s, depois os 4 juntos).")
     print("Segure o drone FIRME pelo corpo, braços livres, mãos longe das hélices.")
-    if input("Digite SIM para girar os motores: ").strip().upper() != "SIM":
+    if not confirmado and input("Digite SIM para girar os motores: ").strip().lstrip("﻿").upper() != "SIM":
         out("  pulado pelo usuário")
         return
     s.write(b"vib 740\n")
@@ -128,19 +128,28 @@ def etapa_vib(s, out):
 
 
 def etapa_voo(s, out, pasta):
-    out("\n== Voo: gravando até Ctrl+C ==")
-    print("Voe normalmente (de preferência no modo LEVE, pairando). Ctrl+C ao terminar, já desarmado.")
-    msgs, a, buf = [], [], ""
+    out("\n== Voo: grava até o pouso (encerra 3 s após desarmar) ou Ctrl+C ==")
+    print("Voe normalmente (de preferência no modo LEVE, pairando). Termina sozinho depois de desarmar.")
+    msgs, a = [], []
+    armou, desarmado_desde, inicio = False, None, time.time()
     try:
-        while True:
+        while time.time() - inicio < 600:   # limite de segurança: 10 min esperando
             m, x = ler_por(s, 0.5)
             msgs += m
             a += x
             if x:
                 u = x[-1]
-                print(f"\r  [{'ARM' if int(u['flags']) & 1 else '---'}] thr {u['thr']:.0f} R {u['roll']:+5.1f} P {u['pitch']:+5.1f}   ", end="", flush=True)
+                armado = bool(int(u["flags"]) & 1)
+                print(f"\r  [{'ARM' if armado else '---'}] thr {u['thr']:.0f} R {u['roll']:+5.1f} P {u['pitch']:+5.1f}   ", end="", flush=True)
+                if armado:
+                    armou, desarmado_desde = True, None
+                elif armou:
+                    desarmado_desde = desarmado_desde or time.time()
+                    if time.time() - desarmado_desde > 3:
+                        break
     except KeyboardInterrupt:
-        print()
+        pass
+    print()
     salvar_csv(pasta, "voo.csv", a)
     for l in msgs:
         if any(k in l for k in ("ARMADO", "Desarmado", "Trim", "Notch", "Bias")):
@@ -177,6 +186,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("porta")
     ap.add_argument("etapas", nargs="*", default=["repouso"], choices=["repouso", "vib", "voo"])
+    ap.add_argument("--confirmado", action="store_true", help="pula a pergunta do vib (confirmacao ja dada)")
     args = ap.parse_args()
 
     pasta = os.path.join(RAIZ, "logs", datetime.datetime.now().strftime("leitura_%Y%m%d_%H%M%S"))
@@ -194,7 +204,7 @@ def main():
         config_atual(s, out)
         for e in args.etapas:
             {"repouso": lambda: etapa_repouso(s, out, pasta),
-             "vib": lambda: etapa_vib(s, out),
+             "vib": lambda: etapa_vib(s, out, args.confirmado),
              "voo": lambda: etapa_voo(s, out, pasta)}[e]()
     finally:
         s.close()
