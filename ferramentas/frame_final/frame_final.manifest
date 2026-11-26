@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion",
+  "type": "script",
+  "author": "",
+  "description": { "": "Frame final: peca unica com pes integrados" },
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}
