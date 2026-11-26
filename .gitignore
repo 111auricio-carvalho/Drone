@@ -1,0 +1,7 @@
+build/
+logs/
+__pycache__/
+*.pyc
+ferramentas/fusion_props/fusion_props.json
+.DS_Store
+Thumbs.db

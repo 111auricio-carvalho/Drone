@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion",
+  "type": "script",
+  "author": "",
+  "description": { "": "Exporta massa, CG e inercia do drone para fusion_props.json" },
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}
