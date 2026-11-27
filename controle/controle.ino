@@ -285,7 +285,7 @@ void loop() {
     // Throttle linear usando curso completo (false) | Direcao e Yaw com curva Expo suave (true)
     pacoteControle.yaw      = -processarEixo(analogRead(PIN_JOY_LX), centroLX, true);
     pacoteControle.throttle = -processarEixo(analogRead(PIN_JOY_LY), centroLY, false);
-    pacoteControle.roll     = -processarEixo(analogRead(PIN_JOY_RX), centroRX, true);
+    pacoteControle.roll     =  processarEixo(analogRead(PIN_JOY_RX), centroRX, true);
     pacoteControle.pitch    = -processarEixo(analogRead(PIN_JOY_RY), centroRY, true);
     pacoteControle.modo     = modoAtual;
     pacoteControle.aux1     = (digitalRead(PIN_BTN_AUX1) == LOW) ? 1 : 0;
