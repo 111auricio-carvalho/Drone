@@ -111,15 +111,15 @@ struct Config {
 };
 
 const Config CONFIG_PADRAO = {
-  0, -1,   // roll  = -X (mesmo sinal do firmware antigo)
-  1, +1,   // pitch = +Y
-  2, +1,   // yaw   = +Z
-  4.0f,
-  0.30f, 0.50f, 0.0020f,
-  0.80f, 0.30f,
-  30.0f,
+  1, -1,   // roll  = -Y
+  0, +1,   // pitch = +X
+  2, -1,   // yaw   = -Z
+  2.50f,
+  0.200f, 1.250f, 0.0018f,
+  0.800f, 0.300f,
+  20.0f,
   60.0f,
-  true
+  false
 };
 
 Config cfg = CONFIG_PADRAO;
@@ -157,15 +157,15 @@ float notchHzSoma = 0;
 uint32_t notchHzN = 0;
 
 // ---- Curva de throttle: stick central = pairar, expo suaviza em volta do centro ----
-float thrHover = 736;       // PWM com o stick no centro (ponto de pairar)
-float thrExpo = 0.6f;       // 0 = linear, 1 = muito suave no centro
-float thrHz = 4.0f;         // suavização do throttle (0 = desligada)
+float thrHover = 840;       // PWM com o stick no centro (ponto de pairar)
+float thrExpo = 0.70f;      // 0 = linear, 1 = muito suave no centro
+float thrHz = 2.0f;         // suavização do throttle (0 = desligada)
 float thrFilt = ESC_IDLE;
-float thrMax = 860;         // limite do stick no máximo ("tmax"): acima de ~830 o M1 causou eventos violentos
+float thrMax = 960;         // limite do stick no máximo ("tmax")
 
 // ---- TPA: atenua P e D com throttle alto (mais rotação = mais autoridade por contagem) ----
-float tpa = 0.4f;           // fração de redução de P/D no throttle máximo (0 = desligado)
-float tpaBreak = 760;       // throttle a partir do qual começa a reduzir
+float tpa = 0.40f;          // fração de redução de P/D no throttle máximo (0 = desligado)
+float tpaBreak = 860;       // throttle a partir do qual começa a reduzir
 float tpaFator = 1.0f;
 
 // Analógico 1 horizontal (yaw): desligado por padrão — o analógico 1 controla só a velocidade.
@@ -175,7 +175,7 @@ bool yawStick = false;
 // Ajuste fino de nível (graus): corrige deriva quando o "zero" do sensor não é o nível real
 // (calibração em superfície inclinada / placa torta). Positivo em nr inclina para a DIREITA,
 // positivo em np inclina o NARIZ para BAIXO (vai para a frente).
-float nivelR = 0, nivelP = 0;
+float nivelR = 0.0f, nivelP = -0.5f;
 
 // "Subida reta": no modo LEVE (botão do controle) o analógico 2 é ignorado —
 // o drone fica travado no nível (com nr/np) e o analógico 1 só sobe/desce.
