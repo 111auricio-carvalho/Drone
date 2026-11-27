@@ -75,7 +75,7 @@ Sem `salvar`, as mudanças valem até o drone reiniciar. **Se a bateria for troc
 
 ## 6. O que já se sabe (26/11/2026)
 
-- **Configuração salva e aprovada** (o usuário "voou bem e controlou"): `ang 2.5`, `rp 0.20`, `ri 1.5`, `rd 0.0016`, `np -0.5`, `thov 840`, `tmax 960`, modo LEVE com o joystick 2 até 5° (`aleve 5`).
+- **Configuração salva e aprovada** ("O último voo foi perfeito", 27,4 s estável em `thr=835–840`, `erroR 1,4–2,1°`, `erroP 0,4–1,5°`, `vibR 6–9 °/s`, `vibP 3–11 °/s`): `ang 2.5`, `rp 0.20`, `ri 1.25`, `rd 0.0018`, `np -0.5`, `nr 0.0`, trim aprendido `R 1.0 P -3.4 Y 28.7`, `thov 840`, `tmax 960`, modo LEVE com o joystick 2 até 5° (`aleve 5`). Reduzir `ri` de `1.5` para `1.25` junto com `rd 0.0018` eliminou o balanço lento de ~1 Hz no pairar.
 - **Estável com o throttle abaixo de ~830** (erro < 1°, vibração 5–10 °/s). **Com 835–900 aparecem surtos de vibração (50–130 °/s)** em qualquer combinação de ganhos testada (ang 2–2,5, rp 0,17–0,23, ri 1,0–2,5, rd 0,0012–0,0018). **Isso é mecânico, não de sintonia:** não tente resolver só com ganhos.
 - **No último voo, o M2 (dianteiro direito) foi o motor mais exigido** (até 1005 com throttle 929), com o nariz caindo mesmo com a frente ~78 acima. **Suspeita: a hélice ou o motor do M2 perdendo empuxo** (hélice frouxa ou patinando, motor ruim). Antes de sintonizar de novo, peça a inspeção:
   - aperto das hélices e dos parafusos dos motores, começando pelo M2 e pelo M1;
